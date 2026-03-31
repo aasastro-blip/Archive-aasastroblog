@@ -1,8 +1,6 @@
 name: Sync Tumblr
 
 on:
-  schedule:
-    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 jobs:
@@ -10,11 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
@@ -24,9 +20,11 @@ jobs:
           pip install tumblr-utils
 
       - name: Backup Tumblr
+        env:
+          TUMBLR_API_KEY: ${{ secrets.TUMBLR_API_KEY }}
         run: |
           mkdir -p backup
-          tumblr-backup aasastroblog.tumblr.com backup
+          python -m tumblr_backup aasastroblog.tumblr.com backup --api-key $TUMBLR_API_KEY
 
       - name: Commit changes
         run: |

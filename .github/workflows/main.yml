@@ -7,8 +7,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # <--- CONTROLLA CHE CI SIA QUESTA RIGA!
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Download Blog
+        run: |
+          mkdir -p backup/aasastro
+          wget --user-agent="Mozilla/5.0" -r -np -k -E -p -nc -P backup/aasastro https://aasastroblog.tumblr.com/ || echo "Done"
+          echo "aasastro.com" > CNAME
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Backup update" || exit 0
+          git push

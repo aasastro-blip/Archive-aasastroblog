@@ -25,7 +25,8 @@ jobs:
 
       - name: Backup Tumblr
         run: |
-          tumblr-backup aasastroblog.tumblr.com
+          mkdir -p backup
+          tumblr-backup aasastroblog.tumblr.com backup
 
       - name: Commit changes
         run: |

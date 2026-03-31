@@ -1,28 +1,43 @@
-name: Backup Tumblr
+name: Full Archive Backup
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  run-backup:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Download Blog
+      - name: Clean and Download
         run: |
+          # Elimina la vecchia cartella per evitare errori di permessi
+          rm -rf backup
           mkdir -p backup
-          curl -L "https://aasastroblog.tumblr.com/" -o backup/index.html
-          echo "www.aasastro.com" > CNAME
+          
+          # Scarica dalla sorgente ORIGINALE di Tumblr (NON dal dominio .com)
+          wget --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" \
+               --mirror \
+               --convert-links \
+               --adjust-extension \
+               --page-requisites \
+               --no-parent \
+               --no-clobber \
+               -P backup https://aasastrosblog.tumblr.com/ || echo "Partial download completed"
 
-      - name: Save to GitHub
+      - name: Domain Setup
+        run: |
+          echo "aasastro.com" > CNAME
+
+      - name: Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Creazione cartella backup" || exit 0
+          # Messaggio tutto in inglese:
+          git commit -m "Automated full site archive" || exit 0
           git push origin main

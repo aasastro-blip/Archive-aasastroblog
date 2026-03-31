@@ -17,7 +17,7 @@ jobs:
         run: |
           mkdir -p backup
           curl -L "https://aasastroblog.tumblr.com/" -o backup/index.html
-          echo "aasastro.com" > CNAME
+          echo "www.aasastro.com" > CNAME
 
       - name: Save to GitHub
         run: |
